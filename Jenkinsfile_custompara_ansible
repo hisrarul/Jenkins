@@ -1,0 +1,40 @@
+pipeline {
+    agent { node { label 'master' } }
+    parameters {
+        password(defaultValue: 'value', description: '', name: 'passwd')
+        string(name: 'CertificateName', defaultValue: 'domain.pem', description: 'Name of the certificate')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '91000f0-9bfc-436c-9249-f0000000000', url: 'https://github.com/hisrarul/Jenkinsfile']]])
+            }
+        }
+        stage('After Checkout') {
+            steps {
+                sh 'pwd; ls'
+            }
+        }
+        stage('Generating') {
+            steps {
+                //ansiblePlaybook(playbook: './playbook.yaml')
+                sh 'ansible-playbook ./playbook.yaml --skip-tags upload --extra-vars "pfxname=${CertificateName} password=${passwd}"'
+            }
+        }
+        stage('Uploading') {
+            steps {
+                sh 'ansible-playbook ./playbook.yaml --tags upload'
+            }
+        }
+        stage('Removing') {
+            steps {
+                sh 'rm -rf /var/lib/jenkins/workspace/cert_files'
+            }
+        }
+        stage('Wipe out workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+    }
+}
