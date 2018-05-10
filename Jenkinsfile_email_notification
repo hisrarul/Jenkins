@@ -1,0 +1,29 @@
+pipeline {
+    agent { node { label 'master' } }
+    stages {
+        stage('After Checkout') {
+            steps {
+                script {
+                    account_id = '123456789012'
+                    ACCOUNT_ID = "$account_id"
+                    accountName = 's0067'
+                    ACCOUNT_NAME = "$accountName"
+                    kmsKey = 'arn:aws:kms:eu-west-1:123456789012:key/1234a-4565-9f46-12345'
+                    KMS_KEY ="$kmsKey"
+                    project_kms_key = 'arn:aws:kms:eu-west-1:123456789012:key/1234a-4565-9f46-12345'
+                    cidr_block = '10.10.10.10/24'
+                }
+            }
+        }
+    }
+post('sending mail') {
+    always {
+      emailext(
+      to: 'xyz@abc.com',
+      subject: "Account Creation Details",
+      // body: "Is this output is ok? \n\n The account creation details are mentioned below: \n\n Account Id: ${ACCOUNT_ID} \n\n Account Name: ${ACCOUNT_NAME} \n\n KMS Key: ${KMS_KEY}"
+      body: "Greeting of the day, \n\n The created account details are mentioned below: \n\n\t 1. ACCOUNT ID: ${account_id} \n\t 2. CIDR RANGE: ${cidr_block} \n\t 3. PROJECT KMS KEY: ${project_kms_key}\n\nRegards,\nDevOps Team\nFor any query feel free to contact us at devops@abc.com"
+      );
+    }
+  }
+}
