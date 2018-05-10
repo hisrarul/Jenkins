@@ -27,3 +27,7 @@ post('sending mail') {
     }
   }
 }
+
+
+# To make it work, you need to install the email plugin
+# To def a variable in the Jenkinsfile, pipeline utility needs to be install.
