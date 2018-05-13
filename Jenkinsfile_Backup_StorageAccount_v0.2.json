@@ -1,0 +1,35 @@
+pipeline {
+    agent { node {label 'master' } }
+    parameters{
+        string(name: 'dest_key', defaultValue: '', description:'Enter the Destination Storage Account Key')
+    }
+   stages{
+       stage('Prepare') {
+           steps {
+               script{
+                   def props = readProperties file: "/var/lib/jenkins/workspace/env.yaml"
+                   env['storage_account'] = props['azure_storage_account']
+                   env['secret_key'] = props['azure_storage_key']
+               }
+           }
+       }
+       stage('Backup') {
+           steps {
+               script{
+                   sh """
+                        set +x
+                            export AZURE_STORAGE_ACCOUNT=${env.storage_account}
+                            export AZURE_STORAGE_KEY=${env.secret_key}
+                        id
+                        /var/lib/jenkins/workspace/StroageAccountBackup/backup_storageaccount.sh ${dest_key}
+                    """
+               }
+           }
+       }
+   }
+}
+
+
+-bash-4.2$ cat workspace/env.yaml
+azure_storage_account: certstorageisrar
+azure_storage_key: 6Sh7vhlcGXZUXoIzdAhh4zGEy6MY+rh6auGsXUmdub96rQ6qO96G3Bg18+pOzb4I4OnbxTHIutFoQ/eHJAeomA==
