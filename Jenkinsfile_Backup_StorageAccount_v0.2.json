@@ -32,4 +32,4 @@ pipeline {
 
 -bash-4.2$ cat workspace/env.yaml
 azure_storage_account: certstorageisrar
-azure_storage_key: 6Sh7vhlcGXZUXoIzdAhh4zGEy6MY+rh6auGsXUmdub96rQ6qO96G3Bg18+pOzb4I4OnbxTHIutFoQ/eHJAeomA==
+azure_storage_key: 1111223300003030396G3Bg18+p
