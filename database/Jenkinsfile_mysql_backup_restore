@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'MYSQL_HOST', defaultValue: 'Your database endpoint', description: 'Enter database url')
+        string(name: 'MYSQL_PORT', defaultValue: '3306', description: 'Database port')
+        string(name: 'MYSQL_DB', defaultValue: 'all', description: 'Enter the name of the database.')
+    }
+    stages {
+        stage ('Take the dump of mysql') {
+            steps {
+                script {
+                    def database = "${params.MYSQL_DB}"
+                    withCredentials([usernamePassword(credentialsId: 'xxxx', passwordVariable: 'MYSQL_PASSWORD', usernameVariable: 'MYSQL_USERNAME')]) { 
+                        if(database == 'all'){
+                            sh "mysqldump -h ${MYSQL_HOST} -P ${MYSQL_PORT} -u ${MYSQL_USERNAME} -p${MYSQL_PASSWORD} --all-databases > ${params.MYSQL_DB}.sql"
+                        }
+                        else {
+                            sh "mysqldump -h ${MYSQL_HOST} -P ${MYSQL_PORT} -u ${MYSQL_USERNAME} -p${MYSQL_PASSWORD} --databases ${MYSQL_DB} > ${params.MYSQL_DB}.sql"
+                        }
+                    }
+                }
+            }
+        }
+        stage ('Restore Dump') {
+            steps {
+                script {
+                    def restored = sh script: "cat  ${params.MYSQL_DB}.sql | mysql -h svcName.nameSpace -P 3306 -u root -p${TMP_MYSQL_PASSWORD}", returnStdout: true
+                }
+            }
+        }
+    }
+}
